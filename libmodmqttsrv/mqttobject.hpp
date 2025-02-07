@@ -195,11 +195,20 @@ class MqttObject {
         void setAvailableValue(const MqttValue& pValue) { mAvailability.setAvailableValue(pValue); }
         AvailableFlag getAvailableFlag() const { return mIsAvailable; }
 
-        void setLastPublishedPayload(const std::string& pVal) { mLastPublishedPayload = pVal; }
+        void setLastPublishedPayload(const std::string& pVal) {
+            mLastPublishedPayload = pVal;
+            mLastPublishTime = std::chrono::steady_clock::now();
+        }
         const std::string& getLastPublishedPayload() const { return mLastPublishedPayload; }
 
-        void setPublishMode(const PublishMode& pMode) { mPublishMode = pMode; }
+        void setPublishMode(const PublishMode& pMode, std::chrono::milliseconds pEveryPollRefresh);
+
         const PublishMode& getPublishMode() const { return mPublishMode; }
+
+        void setRetain(bool pFlag) { mRetain = pFlag; }
+        bool getRetain() const { return mRetain; }
+
+        bool needStateRepublish() const;
 
         MqttObjectState mState;
 
@@ -213,8 +222,11 @@ class MqttObject {
 
         AvailableFlag mIsAvailable = AvailableFlag::NotSet;
 
+        bool mRetain = true;
         PublishMode mPublishMode;
         std::string mLastPublishedPayload;
+        std::chrono::steady_clock::time_point mLastPublishTime = std::chrono::steady_clock::time_point::min();
+        std::chrono::milliseconds mEveryPollPeriod;
 
         void updateAvailablityFlag();
 };

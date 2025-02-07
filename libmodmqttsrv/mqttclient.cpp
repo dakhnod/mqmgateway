@@ -155,13 +155,28 @@ MqttClient::processRegisterValues(const std::string& pModbusNetworkName, const M
         AvailableFlag newAvail = obj->getAvailableFlag();
 
         if (oldAvail != newAvail) {
-            if (newAvail == AvailableFlag::True)
-                publishState(*obj, true);
+            if (newAvail == AvailableFlag::True) {
+                // if object is not retained
+                // then publish state changes only
+                // if availability is already set to true
+                if (obj->getRetain()) {
+                    publishState(*obj, true);
+                } else {
+                    // delete retained message
+                    if (oldAvail == AvailableFlag::NotSet) {
+                        mMqttImpl->publish(obj->getStateTopic().c_str(), 0, NULL, true);
+                        // remember initial payload for comparsion with subsequent modbus data updates
+                        if (!obj->getRetain())
+                            obj->setLastPublishedPayload(MqttPayload::generate(*obj));
+                    }
+                    if (obj->getPublishMode() == PublishMode::EVERY_POLL)
+                        publishState(*obj, true);
+                }
+            }
 
             publishAvailabilityChange(*obj);
         } else {
-            bool force = obj->getPublishMode() == PublishMode::EVERY_POLL;
-            publishState(*obj, force);
+            publishState(*obj, obj->needStateRepublish());
         }
     }
 }
@@ -173,7 +188,7 @@ MqttClient::publishState(MqttObject& obj, bool force) {
     std::string messageData(MqttPayload::generate(obj));
     if (messageData != obj.getLastPublishedPayload() || force) {
         BOOST_LOG_SEV(log, Log::debug) << "Publish on topic " << obj.getStateTopic() << ": " << messageData;
-        mMqttImpl->publish(obj.getStateTopic().c_str(), messageData.length(), messageData.c_str());
+        mMqttImpl->publish(obj.getStateTopic().c_str(), messageData.length(), messageData.c_str(), obj.getRetain());
         obj.setLastPublishedPayload(messageData);
     }
 }
@@ -230,7 +245,7 @@ MqttClient::publishAvailabilityChange(const MqttObject& obj) {
         return;
     char msg = obj.getAvailableFlag() == AvailableFlag::True ? '1' : '0';
     int msgId;
-    mMqttImpl->publish(obj.getAvailabilityTopic().c_str(), 1, &msg);
+    mMqttImpl->publish(obj.getAvailabilityTopic().c_str(), 1, &msg, true);
 }
 
 void

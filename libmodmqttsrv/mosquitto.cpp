@@ -100,8 +100,11 @@ void
 Mosquitto::connect(const MqttBrokerConfig& config) {
     BOOST_LOG_SEV(log, Log::info) << "Connecting to " << config.mHost << ":" << config.mPort;
 
-    int rc = mosquitto_username_pw_set(mMosq, config.mUsername.c_str(), config.mPassword.c_str());
-    throwOnCriticalError(rc);
+    int rc = 0;
+    if (!config.mUsername.empty()) {
+        rc = mosquitto_username_pw_set(mMosq, config.mUsername.c_str(), config.mPassword.c_str());
+        throwOnCriticalError(rc);
+    }
 
     if (config.mTLS) {
       if (config.mCafile.empty()) {
@@ -173,9 +176,9 @@ Mosquitto::subscribe(const char* topic) {
 }
 
 void
-Mosquitto::publish(const char* topic, int len, const void* data) {
+Mosquitto::publish(const char* topic, int len, const void* data, bool retain) {
     int msgId;
-    mosquitto_publish(mMosq, &msgId, topic, len, data, 0, true);
+    mosquitto_publish(mMosq, &msgId, topic, len, data, 0, retain);
 }
 
 

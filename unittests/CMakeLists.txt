@@ -32,11 +32,13 @@ add_executable(tests
     mqtt_command_tests.cpp
     mqtt_command_only_tests.cpp
     mqtt_command_conv_tests.cpp
+    mqtt_every_poll_tests.cpp
     mqtt_config_tests.cpp
     mqtt_named_list_conv_tests.cpp
     mqtt_named_list_tests.cpp
     mqtt_named_scalar_conv_tests.cpp
     mqtt_poll_groups_tests.cpp
+    mqtt_publish_retain_tests.cpp
     mqtt_publish_type_tests.cpp
     mqtt_register_default_slave_tests.cpp
     mqtt_register_id_parser_tests.cpp
