@@ -84,6 +84,7 @@ class ModMqtt {
             const std::string& pDefaultNetwork,
             int pDefaultSlave,
             PublishMode pCurrentMode,
+            int registerOffset,
             std::vector<MsgRegisterPollSpecification>& specs
         );
 
@@ -96,6 +97,7 @@ class ModMqtt {
             const std::string& pSlaveName,
             std::chrono::milliseconds pDefaultRefresh,
             PublishMode pDefaultPublishMode,
+            int defaultRegisterOffset,
             std::vector<MsgRegisterPollSpecification>& pSpecsOut
         );
 
@@ -105,6 +107,7 @@ class ModMqtt {
             int pDefaultSlave,
             std::chrono::milliseconds refresh,
             PublishMode pMode,
+            int registerOffset,
             std::vector<MsgRegisterPollSpecification>& pSpecs
         );
 
@@ -121,13 +124,14 @@ class ModMqtt {
             int nextCommandId,
             const YAML::Node& pCommands,
             const std::string& pDefaultNetwork,
-            int pDefaultSlave
+            int pDefaultSlave,
+            int registerOffset
         );
 
         std::vector<modmqttd::MsgRegisterPoll> readModbusPollGroups(const std::string& modbus_network, int default_slave, const YAML::Node& groups);
         void processModbusMessages();
 
-        MqttObjectCommand parseObjectCommand(const std::string& pTopicPrefix, int nextCommandId, const YAML::Node& node, const std::string& default_network, int default_slave);
+        MqttObjectCommand parseObjectCommand(const std::string& pTopicPrefix, int nextCommandId, const YAML::Node& node, const std::string& default_network, int default_slave, int registerOffset);
 
         bool hasConverterPlugin(const std::string& name) const;
         boost::shared_ptr<ConverterPlugin> initConverterPlugin(const std::string& name);
