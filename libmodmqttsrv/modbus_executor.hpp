@@ -35,7 +35,7 @@ class ModbusExecutor {
          *
          * If queues are empty return duration=max
          */
-        std::chrono::steady_clock::duration executeNext();
+        std::chrono::steady_clock::duration executeNext(std::chrono::steady_clock::time_point now);
 
         bool isInitialPollInProgress() const { return mInitialPoll; }
 
@@ -80,8 +80,8 @@ class ModbusExecutor {
         bool mInitialPoll;
         std::chrono::time_point<std::chrono::steady_clock> mInitialPollStart;
 
-        void sendCommand();
-        void pollRegisters(RegisterPoll& reg_ptr, bool forceSend);
+        void sendCommand(std::chrono::steady_clock::time_point now, bool lastRegister);
+        void pollRegisters(RegisterPoll& reg_ptr, bool forceSend, std::chrono::steady_clock::time_point now, bool shouldPublish);
         void writeRegisters(RegisterWrite& cmd);
         void sendMessage(const QueueItem& item);
         void handleRegisterReadError(RegisterPoll& reg, const char* errorMessage);

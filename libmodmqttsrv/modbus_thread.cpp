@@ -233,7 +233,7 @@ ModbusThread::run() {
                         if (mExecutor.allDone()) {
                             idleWaitDuration = (nextPollTimePoint - now);
                         } else {
-                            idleWaitDuration = mExecutor.executeNext();
+                            idleWaitDuration = mExecutor.executeNext(now);
                             if (idleWaitDuration == std::chrono::steady_clock::duration::zero()) {
                                 mWatchdog.inspectCommand(*mExecutor.getLastCommand());
                             }

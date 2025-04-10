@@ -77,6 +77,8 @@ class RegisterPoll : public RegisterCommand {
 
         PublishMode mPublishMode = PublishMode::ON_CHANGE;
 
+        bool shouldPublish = false;
+
         std::uint16_t errorValue;
     private:
         std::vector<uint16_t> mLastValues;
