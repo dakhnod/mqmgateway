@@ -76,6 +76,8 @@ class RegisterPoll : public RegisterCommand {
         std::chrono::steady_clock::time_point mFirstErrorTime;
 
         PublishMode mPublishMode = PublishMode::ON_CHANGE;
+
+        bool shouldPublish = false;
     private:
         std::vector<uint16_t> mLastValues;
 };

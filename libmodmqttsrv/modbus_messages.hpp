@@ -31,6 +31,8 @@ class MsgRegisterValues : public ModbusSlaveAddressRange {
         int getCommandId() const { return mCommandId; }
         bool hasCommandId() const { return mCommandId != 0; }
 
+        bool shouldPublish;
+
         ModbusRegisters mRegisters;
     private:
         std::chrono::steady_clock::time_point mCreationTime;
